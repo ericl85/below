@@ -1,6 +1,5 @@
 import "phaser";
 import { Player } from "./player";
-import { inputState } from "./inputState";
 
 export default class BelowGame extends Phaser.Scene {
   private _keysToPoll: Phaser.Input.Keyboard.Key[];
@@ -14,6 +13,7 @@ export default class BelowGame extends Phaser.Scene {
 
   preload() {
     this.load.image("ship", "assets/ship1.png");
+    this.load.image("engine", "assets/blue.png");
   }
 
   create() {
@@ -23,9 +23,9 @@ export default class BelowGame extends Phaser.Scene {
       this.input.mouse.requestPointerLock();
     });
 
-    this._keysToPoll.push(
-      this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W)
-    );
+    this.cameras.main.setBounds(0, 0, 16384, 16384);
+    this.cameras.main.startFollow(this._player);
+    this.cameras.main.setZoom(0.5);
   }
 
   update() {}
