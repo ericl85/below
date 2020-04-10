@@ -1,16 +1,32 @@
 import "phaser";
 
+interface Vec2 {
+  x: number;
+  y: number;
+}
+
+export interface PlayerStateMessage {
+  id: number;
+  direction: Vec2;
+  velocity: number;
+}
+
 interface PlayerInputState {
   fireEngine: Phaser.Input.Keyboard.Key;
 }
 
 export class Player extends Phaser.Physics.Arcade.Image {
+  private _playerId: number;
+  private _handleInput: boolean;
   private _keys: PlayerInputState;
   private _particleManager: Phaser.GameObjects.Particles.ParticleEmitterManager;
   private _particleEmitter: Phaser.GameObjects.Particles.ParticleEmitter;
 
-  constructor(scene: Phaser.Scene, x: number, y: number) {
+  constructor(scene: Phaser.Scene, x: number, y: number, id: number, handleInput: boolean) {
     super(scene, x, y, "ship");
+
+    this._playerId = id;
+    this._handleInput = handleInput;
 
     scene.add.existing(this);
     scene.physics.add.existing(this);
@@ -40,12 +56,14 @@ export class Player extends Phaser.Physics.Arcade.Image {
   }
 
   public preUpdate(time, delta) {
-    if (this._keys.fireEngine.isDown) {
-      this.scene.physics.velocityFromRotation(this.rotation, 200, (this.body as Phaser.Physics.Arcade.Body).acceleration);
-      this._particleEmitter.start();
-    } else {
-      this.setAcceleration(0);
-      this._particleEmitter.stop();
+    if (this._handleInput) {
+      if (this._keys.fireEngine.isDown) {
+        this.scene.physics.velocityFromRotation(this.rotation, 200, (this.body as Phaser.Physics.Arcade.Body).acceleration);
+        this._particleEmitter.start();
+      } else {
+        this.setAcceleration(0);
+        this._particleEmitter.stop();
+      }
     }
 
     const emitterPos = Phaser.Math.Rotate({ x: this.width / 2, y: 0 }, this.rotation);
@@ -54,4 +72,8 @@ export class Player extends Phaser.Physics.Arcade.Image {
   }
 
   public update(time, delta) {}
+
+  public getId() {
+    return this._playerId;
+  }
 }

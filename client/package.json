@@ -18,7 +18,9 @@
     "url": "https://github.com/photonstorm/phaser3-typescript-project-template/issues"
   },
   "homepage": "https://github.com/photonstorm/phaser3-typescript-project-template#readme",
-  "dependencies": {},
+  "dependencies": {
+    "@microsoft/signalr": "^3.1.3"
+  },
   "devDependencies": {
     "@rollup/plugin-replace": "^2.3.0",
     "phaser": "^3.22.0",
