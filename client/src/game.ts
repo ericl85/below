@@ -40,16 +40,18 @@ export default class BelowGame extends Phaser.Scene {
 
     // Once we get the join success message, add our player sprite to the scene.
     // Then subscribe to game state updates.
-    connection.on("joinSuccess", (playerState: PlayerStateMessage) => {
-      this._players.push(new Player(this, 400, 300, playerState.id, true));
+    connection.on("joinSuccess", async (playerState: PlayerStateMessage) => {
+      const player = new Player(this, 400, 300, playerState.id, true);
+      this._players.push(player);
 
       connection.stream("gameStateUpdates").subscribe({
         next: (message: PlayerStateMessage) => {
-          let currentPlayer = this._players.find((p) => p.getId() === message.id);
+          let currentPlayer: Player = this._players.find((p) => p.getId() === message.id);
           if (!currentPlayer) {
             currentPlayer = new Player(this, 400, 300, message.id, false);
             this._players.push(currentPlayer);
           }
+          currentPlayer.processUpdate(message);
         },
         complete: () => {
           // Lol wut, how we get here?
@@ -59,6 +61,23 @@ export default class BelowGame extends Phaser.Scene {
           console.error(`Fuck: ${err}`);
         },
       });
+
+      const subject = new signalR.Subject<PlayerStateMessage>();
+      connection.send("playerUpdate", subject);
+      setInterval(() => {
+        subject.next({
+          id: player.getId(),
+          rotation: player.rotation,
+          velocity: {
+            x: (player.body as Phaser.Physics.Arcade.Body).velocity.x,
+            y: (player.body as Phaser.Physics.Arcade.Body).velocity.y,
+          },
+          position: {
+            x: player.x,
+            y: player.y,
+          },
+        });
+      }, 100);
     });
 
     connection.send("join");

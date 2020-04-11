@@ -26,12 +26,17 @@ namespace Below.Server
             var player = new Player
             {
                 Id = playerId,
-                Direction = new Vec2
+                Rotation = 0.0F,
+                Velocity = new Vec2
                 {
-                    X = 1.0F,
-                    Y = 0.0F
+                    X = 10.0F,
+                    Y = 10.0F,
                 },
-                Velocity = 0
+                Position = new Vec2
+                {
+                    X = 400.0F,
+                    Y = 300.0F,
+                }
             };
 
             Players.Add(playerId, player);
@@ -43,13 +48,16 @@ namespace Below.Server
     public class Player
     {
         public int Id { get; set; }
-        public Vec2 Direction { get; set; }
-        public float Velocity { get; set; }
+        public float Rotation { get; set; }
+        public Vec2 Velocity { get; set; }
+        public Vec2 Position { get; set; }
     }
 
     public struct PlayerUpdate
     {
-        public Vec2 Direction { get; set; }
+        public int Id { get; set; }
+        public float Rotation { get; set; }
+        public Vec2 Velocity { get; set; }
         public bool FiringEngine { get; set; }
     }
 }

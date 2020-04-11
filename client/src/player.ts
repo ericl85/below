@@ -7,8 +7,9 @@ interface Vec2 {
 
 export interface PlayerStateMessage {
   id: number;
-  direction: Vec2;
-  velocity: number;
+  rotation: number;
+  velocity: Vec2;
+  position: Vec2;
 }
 
 interface PlayerInputState {
@@ -42,14 +43,15 @@ export class Player extends Phaser.Physics.Arcade.Image {
     });
 
     this.setMaxVelocity(200);
-
-    scene.input.on(
-      "pointermove",
-      (pointer) => {
-        this.setRotation(this.rotation + pointer.movementX / 1000);
-      },
-      this
-    );
+    if (handleInput) {
+      scene.input.on(
+        "pointermove",
+        (pointer) => {
+          this.setRotation(this.rotation + pointer.movementX / 1000);
+        },
+        this
+      );
+    }
 
     const { W } = Phaser.Input.Keyboard.KeyCodes;
     this._keys = scene.input.keyboard.addKeys({ fireEngine: W }) as PlayerInputState;
@@ -75,5 +77,10 @@ export class Player extends Phaser.Physics.Arcade.Image {
 
   public getId() {
     return this._playerId;
+  }
+
+  public processUpdate(update: PlayerStateMessage) {
+    this.setRotation(update.rotation);
+    this.setVelocity(update.velocity.x, update.velocity.y);
   }
 }
